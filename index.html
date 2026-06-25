@@ -512,7 +512,7 @@
   // ════════════════════════════════════════════════
   // ⚙️  KONFIGURASI — GANTI BAGIAN INI
   // ════════════════════════════════════════════════
-  const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS3NnGuIRou-yGn_Ly-YJFFwL18UWakhwrKK1UG0dIv_1KqaBICXdNUMzrRw3vczjFv44ZfTTjS-w7l/pub?gid=0&single=true&output=csv";
+  const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS3NnGuIRou-yGn_Ly-YJFFwL18UWakhwrKK1UG0dIv_1KqaBICXdNUMzrRw3vczjFv44ZfTTjS-w7l/pub?gid=1344866496&single=true&output=csv";
   // Contoh: "https://docs.google.com/spreadsheets/d/xxxx/export?format=csv&gid=0"
   // Cara dapat URL ini: lihat CARA-SETUP.md
   // ════════════════════════════════════════════════
@@ -593,8 +593,15 @@
 
       const obj = { id: idx + 1 };
       headers.forEach((h, i) => { obj[h] = (cols[i] || "").replace(/^"|"$/g, "").trim(); });
+      // Normalisasi nama kolom dari Form Responses 1
+      if (!obj.judul   && obj["judul jurnal"])  obj.judul   = obj["judul jurnal"];
+      if (!obj.tahun   && obj["tahun terbit"])  obj.tahun   = obj["tahun terbit"];
+      if (!obj.link    && obj["link jurnal"])   obj.link    = obj["link jurnal"];
+      if (!obj.pdf     && obj["link pdf"])      obj.pdf     = obj["link pdf"];
+      if (!obj.sampul  && obj["link sampul"])   obj.sampul  = obj["link sampul"];
+      if (!obj.abstrak && obj["abstrak"])       obj.abstrak = obj["abstrak"];
       return obj;
-    }).filter(r => r.judul); // skip empty rows
+    }).filter(r => r.judul || r["judul jurnal"]); // skip empty rows
   }
 
   // ── LOAD FROM SHEETS ──
@@ -700,7 +707,7 @@
           </div>
           <h3 class="card-title">${j.judul}</h3>
           <p class="card-authors">${j.penulis}</p>
-          <p class="card-abstract">${j.abstrak}</p>
+          <p class="card-abstract">${(j.abstrak||"").slice(0,200)}${(j.abstrak||"").length > 200 ? "…" : ""}</p>
           <div class="card-foot">
             <span class="card-doi">${j.doi ? "doi: " + j.doi : ""}</span>
             <div class="card-acts">
