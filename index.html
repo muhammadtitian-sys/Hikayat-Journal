@@ -713,34 +713,8 @@
 
   // ── MODAL ──
   function openModal(id) {
-    const j = allData.find(x => x.id === id);
-    if (!j) return;
-
-    const pdfUrl  = driveToPDF(j.pdf);
-    const hasPDF  = pdfUrl !== "";
-    const hasLink = j.link && j.link !== "-" && j.link !== "";
-
-    document.getElementById("mBadge").innerHTML =
-      `<span class="badge ${badgeClass(j.bidang)}">${j.bidang || "Umum"}</span>`;
-    document.getElementById("mTitle").textContent = j.judul;
-    document.getElementById("mMetas").innerHTML = `
-      <div class="meta-item"><span class="meta-lbl">Penulis</span><span class="meta-val">${j.penulis}</span></div>
-      <div class="meta-item"><span class="meta-lbl">Tahun</span><span class="meta-val">${j.tahun}</span></div>
-      ${j.doi ? `<div class="meta-item"><span class="meta-lbl">DOI</span><span class="meta-val">${j.doi}</span></div>` : ""}
-      ${j.penerbit ? `<div class="meta-item"><span class="meta-lbl">Penerbit</span><span class="meta-val">${j.penerbit}</span></div>` : ""}
-    `;
-    document.getElementById("mAbstract").textContent = j.abstrak;
-    document.getElementById("mKw").innerHTML =
-      (j["kata kunci"] || "").split(";").filter(Boolean)
-        .map(k => `<span class="kw">${k.trim()}</span>`).join("");
-    document.getElementById("mCta").innerHTML = `
-      ${hasPDF  ? `<a href="${pdfUrl}" class="cta-dl"  target="_blank" rel="noopener">${icoDl} Unduh PDF</a>` : ""}
-      ${hasLink ? `<a href="${j.link}" class="cta-ext" target="_blank" rel="noopener">${icoExt} Buka di sumber</a>` : ""}
-    `;
-
-    document.getElementById("overlay").classList.add("open");
-    document.body.style.overflow = "hidden";
-  }
+  window.location.href = "jurnal.html?id=" + id;
+}
 
   function closeModal() {
     document.getElementById("overlay").classList.remove("open");
