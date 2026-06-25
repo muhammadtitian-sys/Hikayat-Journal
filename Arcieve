@@ -470,7 +470,7 @@
   // ════════════════════════════════════════════════
   // ⚙️  KONFIGURASI — GANTI BAGIAN INI
   // ════════════════════════════════════════════════
-  const SHEET_CSV_URL = "GANTI_DENGAN_URL_CSV_SHEETS_LO";
+  const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS3NnGuIRou-yGn_Ly-YJFFwL18UWakhwrKK1UG0dIv_1KqaBICXdNUMzrRw3vczjFv44ZfTTjS-w7l/pub?gid=0&single=true&output=csv";
   // Contoh: "https://docs.google.com/spreadsheets/d/xxxx/export?format=csv&gid=0"
   // Cara dapat URL ini: lihat CARA-SETUP.md
   // ════════════════════════════════════════════════
