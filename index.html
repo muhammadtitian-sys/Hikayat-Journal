@@ -409,7 +409,7 @@
     </span>
   </a>
   <div class="nav-right">
-    <a href="https://forms.gle/GANTI_LINK_FORM_LO" target="_blank" class="btn-sm fill">+ Submit Jurnal</a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdo7rt-7LvhdQxooAcohiVXdiB-h4tw01NuzOQYiD-ZIjbEWA/viewform?usp=publish-editor" target="_blank" class="btn-sm fill">+ Submit Jurnal</a>
   </div>
 </nav>
 
@@ -508,6 +508,35 @@
   // Contoh: "https://docs.google.com/spreadsheets/d/xxxx/export?format=csv&gid=0"
   // Cara dapat URL ini: lihat CARA-SETUP.md
   // ════════════════════════════════════════════════
+
+  // ── KONVERSI LINK GOOGLE DRIVE OTOMATIS ──
+  // Mengubah berbagai format link Drive menjadi link yang bisa dipakai website
+  function driveToImage(url) {
+    if (!url || url === "-" || url === "") return "";
+    // Sudah dalam format thumbnail
+    if (url.includes("thumbnail?id=")) return url;
+    // Format: /file/d/FILE_ID/view
+    const m1 = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (m1) return `https://drive.google.com/thumbnail?id=${m1[1]}&sz=w600`;
+    // Format: id=FILE_ID
+    const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (m2) return `https://drive.google.com/thumbnail?id=${m2[1]}&sz=w600`;
+    // Bukan Drive, kembalikan apa adanya
+    return url;
+  }
+
+  function driveToPDF(url) {
+    if (!url || url === "-" || url === "") return "";
+    // Sudah format download
+    if (url.includes("export=download") || url.includes("uc?export")) return url;
+    // Format: /file/d/FILE_ID/view
+    const m1 = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (m1) return `https://drive.google.com/uc?export=download&id=${m1[1]}`;
+    // Format: id=FILE_ID
+    const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (m2) return `https://drive.google.com/uc?export=download&id=${m2[1]}`;
+    return url;
+  }
 
   // Badge class berdasarkan nama bidang (case-insensitive)
   const BADGE = {
@@ -646,12 +675,14 @@
     empty.classList.remove("show");
 
     grid.innerHTML = filtered.map(j => {
-      const hasPDF  = j.pdf && j.pdf !== "-" && j.pdf !== "";
-      const hasLink = j.link && j.link !== "-" && j.link !== "";
+      const sampulUrl = driveToImage(j.sampul);
+      const pdfUrl    = driveToPDF(j.pdf);
+      const hasPDF    = pdfUrl !== "";
+      const hasLink   = j.link && j.link !== "-" && j.link !== "";
       return `
       <article class="card" data-id="${j.id}" tabindex="0" role="button" aria-label="${j.judul}">
-        ${j.sampul && j.sampul !== "-" && j.sampul !== ""
-          ? `<div class="card-cover"><img src="${j.sampul}" alt="Sampul ${j.judul}" loading="lazy" /></div>`
+        ${sampulUrl
+          ? `<div class="card-cover"><img src="${sampulUrl}" alt="Sampul ${j.judul}" loading="lazy" /></div>`
           : `<div class="card-cover"><div class="card-cover-placeholder"><span>${j.bidang || "Jurnal"}</span></div></div>`
         }
         <div class="card-body">
@@ -666,7 +697,7 @@
             <span class="card-doi">${j.doi ? "doi: " + j.doi : ""}</span>
             <div class="card-acts">
               ${hasLink ? `<a href="${j.link}" class="act act-link" target="_blank" rel="noopener" onclick="event.stopPropagation()">${icoExt} Lihat</a>` : ""}
-              ${hasPDF  ? `<a href="${j.pdf}"  class="act act-dl"   target="_blank" rel="noopener" onclick="event.stopPropagation()">${icoDl} PDF</a>` : ""}
+              ${hasPDF  ? `<a href="${pdfUrl}" class="act act-dl"   target="_blank" rel="noopener" onclick="event.stopPropagation()">${icoDl} PDF</a>` : ""}
             </div>
           </div>
         </div>
@@ -684,7 +715,8 @@
     const j = allData.find(x => x.id === id);
     if (!j) return;
 
-    const hasPDF  = j.pdf  && j.pdf  !== "-" && j.pdf  !== "";
+    const pdfUrl  = driveToPDF(j.pdf);
+    const hasPDF  = pdfUrl !== "";
     const hasLink = j.link && j.link !== "-" && j.link !== "";
 
     document.getElementById("mBadge").innerHTML =
@@ -701,7 +733,7 @@
       (j["kata kunci"] || "").split(";").filter(Boolean)
         .map(k => `<span class="kw">${k.trim()}</span>`).join("");
     document.getElementById("mCta").innerHTML = `
-      ${hasPDF  ? `<a href="${j.pdf}"  class="cta-dl"  target="_blank" rel="noopener">${icoDl} Unduh PDF</a>` : ""}
+      ${hasPDF  ? `<a href="${pdfUrl}" class="cta-dl"  target="_blank" rel="noopener">${icoDl} Unduh PDF</a>` : ""}
       ${hasLink ? `<a href="${j.link}" class="cta-ext" target="_blank" rel="noopener">${icoExt} Buka di sumber</a>` : ""}
     `;
 
